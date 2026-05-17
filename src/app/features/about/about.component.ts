@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ResumeDataService } from '../../core/services/resume-data.service';
+import { PdfGeneratorService } from '../../core/services/pdf-generator.service';
 import { ResumeData } from '../../core/models/resume.model';
 import { HeroComponent } from './components/hero/hero.component';
 import { ExperienceComponent } from './components/experience/experience.component';
@@ -62,6 +63,7 @@ import { SectionLabelComponent } from '../../shared/components/section-label.com
 })
 export class AboutComponent implements OnInit {
   private resumeService = inject(ResumeDataService);
+  private pdfService = inject(PdfGeneratorService);
   resumeData!: ResumeData;
 
   ngOnInit(): void {
@@ -69,13 +71,6 @@ export class AboutComponent implements OnInit {
   }
 
   downloadResume(): void {
-    const text = this.resumeService.getResumeAsText();
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Jisha_MG_Resume_2026.txt';
-    a.click();
-    URL.revokeObjectURL(url);
+    this.pdfService.downloadCV();
   }
 }
