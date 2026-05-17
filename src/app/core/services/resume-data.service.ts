@@ -12,6 +12,8 @@ export class ResumeDataService {
       email: 'jishageorgemukkungal.1224@gmail.com',
       phone: '+918867912874',
       linkedin: 'https://www.linkedin.com/in/jisha-george/',
+      github: 'https://github.com/jishaGeorgeMukkungal',
+      portfolio: 'https://jisha-job-match-analyzer.netlify.app',
       summary: `Frontend Engineering Lead with 9+ years of experience designing, architecting, and delivering
         scalable enterprise web applications using Angular and modern frontend technologies. Proven expertise
         in frontend architecture, UI scalability, performance optimization, reusable component systems, and

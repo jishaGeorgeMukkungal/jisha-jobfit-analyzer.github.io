@@ -27,6 +27,12 @@ import { PersonalInfo } from '../../../../core/models/resume.model';
           <a class="contact-link" [href]="info.linkedin" target="_blank" rel="noopener noreferrer">
             <i class="ti ti-brand-linkedin" aria-hidden="true"></i>LinkedIn
           </a>
+          <a class="contact-link" [href]="info.github" target="_blank" rel="noopener noreferrer">
+            <i class="ti ti-brand-github" aria-hidden="true"></i>GitHub
+          </a>
+          <a class="contact-link" [href]="info.portfolio" target="_blank" rel="noopener noreferrer">
+            <i class="ti ti-world" aria-hidden="true"></i>Portfolio
+          </a>
         </div>
       </div>
       <button class="download-btn" (click)="onDownload.emit()">

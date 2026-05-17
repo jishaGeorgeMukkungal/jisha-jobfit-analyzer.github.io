@@ -5,6 +5,8 @@ export interface PersonalInfo {
   email: string;
   phone: string;
   linkedin: string;
+  github: string;
+  portfolio: string;
   summary: string;
   tags: string[];
   initials: string;
