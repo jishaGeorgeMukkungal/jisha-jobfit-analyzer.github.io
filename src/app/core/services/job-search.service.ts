@@ -100,6 +100,109 @@ export class JobSearchService {
     );
   }
 
+  // ── Custom / AI-powered search ─────────────────────────────────────────
+  searchWithQuery(input: string): Observable<DiscoveredJob[]> {
+    const { queries, locationIncludes, keywordFilter } = this.parseInput(input);
+    const resumeText = this.resumeService.getResumeAsText();
+
+    const fetches$ = queries.map(q =>
+      this.http.get<RemotiveResponse>(
+        `${REMOTIVE_BASE}?category=software-dev&search=${encodeURIComponent(q)}&limit=20`
+      ).pipe(catchError(() => of({ 'job-count': 0, jobs: [] } as RemotiveResponse)))
+    );
+
+    return forkJoin(fetches$).pipe(
+      map(responses => {
+        const all = responses.flatMap(r => r.jobs);
+        const unique = Array.from(new Map(all.map(j => [j.id, j])).values());
+        return unique.filter(j =>
+          this.isLocationMatchCustom(j.candidate_required_location, locationIncludes) &&
+          this.isRecentJob(j.publication_date) &&
+          this.containsAnyKeyword(j.title + ' ' + j.description, keywordFilter)
+        );
+      }),
+      switchMap(jobs => {
+        if (jobs.length === 0) return of([]);
+        return forkJoin(jobs.map(job => {
+          const description = this.stripHtml(job.description);
+          const request: JdAnalysisRequest = {
+            company: job.company_name, role: job.title,
+            jobDescription: description, resumeText,
+          };
+          return this.analysisService.analyse(request).pipe(
+            map(result => ({
+              id: String(job.id), title: job.title, company: job.company_name,
+              companyLogo: job.company_logo, location: job.candidate_required_location || 'Remote',
+              jobType: this.formatJobType(job.job_type), url: job.url, description,
+              salary: job.salary || '', postedAt: job.publication_date, tags: job.tags ?? [],
+              score: result.overall_score, grade: result.grade, result,
+            } as DiscoveredJob))
+          );
+        }));
+      }),
+      map(jobs => jobs.filter(j => j.score >= DEFAULT_CRITERIA.minScore).sort((a, b) => b.score - a.score))
+    );
+  }
+
+  private parseInput(input: string): { queries: string[]; locationIncludes: string[]; keywordFilter: string[] } {
+    const lower = input.toLowerCase().trim();
+
+    const locationMap: Record<string, string[]> = {
+      bangalore: ['india', 'bangalore', 'bengaluru'], bengaluru: ['india', 'bangalore', 'bengaluru'],
+      india: ['india', 'bangalore', 'bengaluru'],
+      remote: ['worldwide', 'anywhere', 'global', 'remote'],
+      hybrid: ['worldwide', 'remote', 'india', 'bangalore'],
+      germany: ['germany', 'berlin', 'munich', 'frankfurt', 'hamburg', 'europe'],
+      europe: ['europe', 'germany', 'netherlands', 'france', 'spain', 'poland', 'sweden', 'switzerland', 'ireland', 'portugal', 'austria', 'belgium', 'denmark', 'norway', 'finland', 'italy', 'czech', 'romania'],
+      netherlands: ['netherlands', 'amsterdam', 'europe'], france: ['france', 'paris', 'europe'],
+      spain: ['spain', 'madrid', 'europe'], uk: ['uk', 'london', 'united kingdom'],
+      sweden: ['sweden', 'stockholm', 'europe'], poland: ['poland', 'warsaw', 'europe'],
+    };
+
+    const locationTriggers = Object.keys(locationMap).concat(['blr', 'berlin', 'munich', 'amsterdam', 'paris', 'london', 'stockholm', 'warsaw']);
+    const alwaysInclude = ['worldwide', 'anywhere', 'global', 'remote'];
+
+    const locationIncludes = new Set<string>(alwaysInclude);
+    let hasLocation = false;
+
+    for (const [key, vals] of Object.entries(locationMap)) {
+      if (lower.includes(key)) { vals.forEach(v => locationIncludes.add(v)); hasLocation = true; }
+    }
+    if (!hasLocation) LOCATION_INCLUDE.forEach(l => locationIncludes.add(l));
+
+    // Strip location/stop words to build clean API query
+    const stopWords = ['job', 'jobs', 'role', 'position', 'based', 'work', 'working', 'opportunity', 'opening', 'in', 'at', 'for', 'with', 'and', 'or', 'a', 'the'];
+    let queryText = lower;
+    locationTriggers.forEach(t => { queryText = queryText.replace(new RegExp(`\\b${t}\\b`, 'gi'), ''); });
+    stopWords.forEach(w => { queryText = queryText.replace(new RegExp(`\\b${w}\\b`, 'gi'), ''); });
+    queryText = queryText.replace(/\s+/g, ' ').trim();
+
+    const queries = queryText ? [queryText] : ['angular lead'];
+    if (queryText && queryText.split(' ').length < 3) queries.push(queryText + ' lead', queryText + ' architect');
+
+    // Keywords to verify the job text contains
+    const filterStopWords = new Set(['in', 'at', 'for', 'with', 'and', 'or', 'a', 'an', 'the', 'to', 'of', ...stopWords]);
+    const keywordFilter = queryText.split(/\s+/).filter(w => w.length > 2 && !filterStopWords.has(w) && !locationTriggers.includes(w));
+
+    return {
+      queries: [...new Set(queries)].filter(q => q.trim()).slice(0, 3),
+      locationIncludes: Array.from(locationIncludes),
+      keywordFilter: keywordFilter.length > 0 ? keywordFilter : REQUIRED_KEYWORDS,
+    };
+  }
+
+  private isLocationMatchCustom(location: string, includes: string[]): boolean {
+    if (!location.trim()) return true;
+    const loc = location.toLowerCase();
+    if (LOCATION_EXCLUDE.some(e => loc.includes(e))) return false;
+    return includes.some(i => loc.includes(i));
+  }
+
+  private containsAnyKeyword(text: string, keywords: string[]): boolean {
+    const lower = text.toLowerCase();
+    return keywords.some(kw => lower.includes(kw));
+  }
+
   private isLocationMatch(location: string): boolean {
     const loc = (' ' + (location ?? '') + ' ').toLowerCase();
     if (!location.trim()) return true; // empty = worldwide

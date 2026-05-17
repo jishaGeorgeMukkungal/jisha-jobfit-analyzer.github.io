@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { JobSearchService } from '../../core/services/job-search.service';
 import { SavedJobsService } from '../../core/services/saved-jobs.service';
 import { SectionLabelComponent } from '../../shared/components/section-label.component';
@@ -9,17 +10,50 @@ import { JdAnalysisRequest } from '../../core/models/jd-analysis.model';
 @Component({
   selector: 'app-job-hunt',
   standalone: true,
-  imports: [DatePipe, SectionLabelComponent],
+  imports: [DatePipe, FormsModule, SectionLabelComponent],
   template: `
     <app-section-label text="Job Hunt by AI" />
+
+    <!-- AI Search bar -->
+    <div class="search-wrap">
+      <div class="search-bar">
+        <i class="ti ti-sparkles search-icon" aria-hidden="true"></i>
+        <input
+          class="search-input"
+          [(ngModel)]="userQuery"
+          (keydown.enter)="onSearch()"
+          placeholder="e.g. Angular lead Bangalore  ·  UI architect Germany  ·  Frontend manager remote"
+        />
+        @if (userQuery) {
+          <button class="clear-query-btn" (click)="clearSearch()" title="Clear and reset to AI defaults">
+            <i class="ti ti-x" aria-hidden="true"></i>
+          </button>
+        }
+        <button class="search-btn" (click)="onSearch()" [disabled]="loading || !userQuery.trim()">
+          <i class="ti ti-arrow-right" aria-hidden="true"></i> Search
+        </button>
+      </div>
+      <div class="search-tips">
+        Try: <span (click)="quickSearch('Angular architect Bangalore hybrid')">Angular architect Bangalore hybrid</span>
+        &nbsp;·&nbsp; <span (click)="quickSearch('Frontend lead Germany relocation')">Frontend lead Germany relocation</span>
+        &nbsp;·&nbsp; <span (click)="quickSearch('UI architect remote Europe')">UI architect remote Europe</span>
+      </div>
+    </div>
 
     <!-- Search criteria bar -->
     <div class="criteria-bar">
       <div class="criteria-info">
         <i class="ti ti-robot" aria-hidden="true"></i>
         <div>
-          <div class="criteria-roles">Angular · UI Architect · JavaScript / TypeScript roles</div>
-          <div class="criteria-sub">Bangalore (Hybrid/Remote) &nbsp;·&nbsp; Germany &amp; Europe (relocation) &nbsp;·&nbsp; Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65%</div>
+          @if (isCustomSearch) {
+            <div class="criteria-roles">Custom search: "{{ activeQueryLabel }}"</div>
+            <div class="criteria-sub">Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65% &nbsp;·&nbsp;
+              <span class="reset-link" (click)="clearSearch()">← Reset to AI defaults</span>
+            </div>
+          } @else {
+            <div class="criteria-roles">Angular · UI Architect · JavaScript / TypeScript roles</div>
+            <div class="criteria-sub">Bangalore (Hybrid/Remote) &nbsp;·&nbsp; Germany &amp; Europe (relocation) &nbsp;·&nbsp; Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65%</div>
+          }
         </div>
       </div>
       <button class="refresh-btn" (click)="runSearch()" [disabled]="loading">
@@ -170,6 +204,23 @@ import { JdAnalysisRequest } from '../../core/models/jd-analysis.model';
     }
   `,
   styles: [`
+    /* ── Search bar ──────────────────────────────────────────── */
+    .search-wrap { margin-bottom: 12px; }
+    .search-bar { display: flex; align-items: center; gap: 0; background: #fff; border: 1.5px solid #D85A30; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(216,90,48,0.1); }
+    .search-icon { font-size: 18px; color: #D85A30; padding: 0 12px; flex-shrink: 0; }
+    .search-input { flex: 1; border: none; outline: none; font-size: 14px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; padding: 13px 4px; background: transparent; min-width: 0; }
+    .search-input::placeholder { color: #9ca3af; }
+    .clear-query-btn { background: none; border: none; cursor: pointer; color: #9ca3af; padding: 0 8px; display: flex; align-items: center; flex-shrink: 0; font-size: 14px; }
+    .clear-query-btn:hover { color: #E24B4A; }
+    .search-btn { background: #D85A30; color: #fff; border: none; padding: 0 20px; height: 100%; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; transition: background 0.15s; min-height: 48px; }
+    .search-btn:hover:not(:disabled) { background: #c04e26; }
+    .search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .search-tips { font-size: 11px; color: #9ca3af; margin-top: 6px; padding-left: 2px; }
+    .search-tips span { color: #D85A30; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+    .search-tips span:hover { color: #993C1D; }
+    .reset-link { color: rgba(255,255,255,0.7); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+    .reset-link:hover { color: #fff; }
+
     /* ── Criteria bar ────────────────────────────────────────── */
     .criteria-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(135deg, #1a1a2e 0%, #26215C 100%); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; }
     .criteria-info { display: flex; align-items: flex-start; gap: 12px; }
@@ -278,6 +329,9 @@ export class JobHuntComponent implements OnInit {
   error: string | null = null;
   searched = false;
   expandedId: string | null = null;
+  userQuery = '';
+  isCustomSearch = false;
+  activeQueryLabel = '';
 
   readonly loadingMessages = [
     'Scanning for Angular & UI Architect roles…',
@@ -295,13 +349,37 @@ export class JobHuntComponent implements OnInit {
   }
 
   runSearch(): void {
+    this.isCustomSearch = false;
+    this.activeQueryLabel = '';
+    this.executeSearch(this.searchService.searchJobs());
+  }
+
+  onSearch(): void {
+    const q = this.userQuery.trim();
+    if (!q || this.loading) return;
+    this.isCustomSearch = true;
+    this.activeQueryLabel = q;
+    this.executeSearch(this.searchService.searchWithQuery(q));
+  }
+
+  quickSearch(query: string): void {
+    this.userQuery = query;
+    this.onSearch();
+  }
+
+  clearSearch(): void {
+    this.userQuery = '';
+    this.runSearch();
+  }
+
+  private executeSearch(search$: ReturnType<typeof this.searchService.searchJobs>): void {
     this.loading = true;
     this.error = null;
     this.results = [];
     this.expandedId = null;
     this.startMessages();
 
-    this.searchService.searchJobs().subscribe({
+    search$.subscribe({
       next: jobs => {
         this.results = jobs;
         this.searched = true;
