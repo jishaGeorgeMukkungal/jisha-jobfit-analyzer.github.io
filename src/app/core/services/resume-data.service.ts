@@ -14,12 +14,7 @@ export class ResumeDataService {
       linkedin: 'https://www.linkedin.com/in/jisha-george/',
       github: 'https://github.com/jishaGeorgeMukkungal',
       portfolio: 'https://jisha-job-match-analyzer.netlify.app',
-      summary: `Frontend Engineering Lead with 9+ years of experience designing, architecting, and delivering
-        scalable enterprise web applications using Angular and modern frontend technologies. Proven expertise
-        in frontend architecture, UI scalability, performance optimization, reusable component systems, and
-        technical leadership. Currently leading cross-functional frontend teams for mission-critical
-        customer-facing platforms at Digit Insurance, driving frontend strategy, engineering standards,
-        delivery execution, and architecture modernization. Experienced in leading teams of 15+ engineers.`,
+      summary: `Frontend Engineering Lead with 9+ years of experience designing, architecting, and delivering scalable enterprise web applications using Angular and modern frontend technologies. Proven expertise in frontend architecture, UI scalability, performance optimization, reusable component systems, and technical leadership.\n\nCurrently leading cross-functional frontend teams for mission-critical customer-facing platforms at Digit Insurance, driving frontend strategy, engineering standards, delivery execution, and architecture modernization initiatives.\n\nExperienced in leading teams of 15+ engineers, mentoring developers, collaborating with stakeholders, and building high-performance digital platforms used by millions of users.`,
       tags: ['Open to work', 'Bangalore, India', '9+ years exp', 'Angular Architect'],
       initials: 'JM'
     },
@@ -32,12 +27,15 @@ export class ResumeDataService {
         period: 'September 2018 – Present',
         description: [
           'Lead frontend architecture and technical delivery for mission-critical customer-facing insurance platforms',
-          'Manage and mentor frontend engineering team of 15+ developers and drive engineering excellence across multiple initiatives',
+          'Manage and mentor frontend engineering team consisted above 15 developers and drive engineering excellence across multiple initiatives',
           'Define scalable frontend standards, reusable UI component systems, and architectural best practices',
-          'Improved application performance by 35% through optimization strategies, lazy loading, caching, and code splitting',
+          'Improve delivery efficiency through structured engineering governance, release planning, and technical reviews',
+          'Drive performance optimization and architect scalable customer-facing web platforms used by millions of users, improving application performance by 35% through optimization strategies, lazy loading, caching, and code splitting',
           'Spearheaded Google Pay SPOT integration across multiple insurance products',
+          'Collaborate closely with Product, QA, Design, and Engineering teams to deliver scalable, high-quality digital experiences while overseeing sprint execution, technical planning, risk management, and release coordination',
+          'Establish frontend engineering standards, reusable architecture patterns, and development best practices through code reviews, mentoring, and technical workshops for frontend developers',
           'Led Angular migration initiatives from Angular 13 to Angular 20',
-          'Collaborate with Product, QA, Design, and Engineering teams to deliver scalable, high-quality digital experiences'
+          'Collaborated with stakeholders to align business goals with scalable technical solutions'
         ]
       },
       {
@@ -108,7 +106,7 @@ export class ResumeDataService {
       {
         id: 'proj-1',
         title: 'Direct Portal – Enterprise Insurance Platform',
-        description: 'Led frontend architecture for a large-scale insurance platform. Built reusable component libraries that reduced development effort by 30% while improving scalability, maintainability, accessibility, and performance.',
+        description: 'Led frontend architecture for a large-scale insurance platform, building reusable component libraries that reduced development effort by 30% while improving scalability, maintainability, accessibility, and performance.',
         iconColor: '#EEEDFE',
         icon: 'ti-layout-dashboard'
       },
@@ -118,13 +116,6 @@ export class ResumeDataService {
         description: 'Architected secure Angular-based Google Pay SPOT purchase journeys, delivering scalable high-traffic frontend experiences handling millions of transactions in collaboration with external stakeholders.',
         iconColor: '#E1F5EE',
         icon: 'ti-credit-card'
-      },
-      {
-        id: 'proj-3',
-        title: 'Angular 13 → 20 Migration',
-        description: 'Led end-to-end Angular migration initiative across mission-critical insurance platforms, modernizing the architecture and adopting latest Angular features for improved DX and performance.',
-        iconColor: '#FAEEDA',
-        icon: 'ti-refresh'
       }
     ],
 
@@ -150,9 +141,17 @@ export class ResumeDataService {
       {
         id: 'award-4',
         title: 'Academic Merit Award',
-        year: '2016',
-        organization: 'Jain University – Top 3 Rank in M.Sc. Information Technology'
+        year: '',
+        organization: 'Top 3 Rank in M.Sc. Information Technology'
       }
+    ],
+
+    additionalInfo: [
+      'Notice Period: 90 days',
+      'Work Authorization: Non-EU Citizen',
+      'Relocation: Open to relocation within Germany and Europe if work visa sponsored',
+      'Preferred Roles: Team Lead Frontend, Angular Architect, Frontend Engineering Lead, UI Architect',
+      'Languages: English (Fluent), Hindi, Kannada, Malayalam'
     ]
   };
 

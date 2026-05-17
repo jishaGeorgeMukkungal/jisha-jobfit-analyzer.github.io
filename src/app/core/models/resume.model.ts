@@ -56,4 +56,5 @@ export interface ResumeData {
   education: Education[];
   projects: Project[];
   awards: Award[];
+  additionalInfo: string[];
 }
