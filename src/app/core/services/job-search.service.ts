@@ -5,7 +5,11 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { JdAnalysisService } from './jd-analysis.service';
 import { ResumeDataService } from './resume-data.service';
 import { JdAnalysisRequest } from '../models/jd-analysis.model';
-import { DEFAULT_CRITERIA, DiscoveredJob } from '../models/job-hunt.model';
+import {
+  DEFAULT_CRITERIA, DiscoveredJob,
+  LOCATION_INCLUDE, LOCATION_EXCLUDE,
+  REQUIRED_KEYWORDS, POSTED_WITHIN_DAYS,
+} from '../models/job-hunt.model';
 
 interface RemotiveJob {
   id: number;
@@ -47,9 +51,14 @@ export class JobSearchService {
 
     return forkJoin(fetches$).pipe(
       map(responses => {
-        // Combine and deduplicate by job id
+        // Combine, deduplicate, then apply pre-score filters
         const all = responses.flatMap(r => r.jobs);
-        return Array.from(new Map(all.map(j => [j.id, j])).values());
+        const unique = Array.from(new Map(all.map(j => [j.id, j])).values());
+        return unique.filter(j =>
+          this.isLocationMatch(j.candidate_required_location) &&
+          this.isRecentJob(j.publication_date) &&
+          this.hasRequiredKeyword(j.title + ' ' + j.description)
+        );
       }),
       switchMap(jobs => {
         if (jobs.length === 0) return of([]);
@@ -89,6 +98,23 @@ export class JobSearchService {
           .sort((a, b) => b.score - a.score)
       )
     );
+  }
+
+  private isLocationMatch(location: string): boolean {
+    const loc = (' ' + (location ?? '') + ' ').toLowerCase();
+    if (!location.trim()) return true; // empty = worldwide
+    if (LOCATION_EXCLUDE.some(e => loc.includes(e))) return false;
+    return LOCATION_INCLUDE.some(i => loc.includes(i));
+  }
+
+  private isRecentJob(publicationDate: string): boolean {
+    const cutoff = new Date(Date.now() - POSTED_WITHIN_DAYS * 24 * 60 * 60 * 1000);
+    return new Date(publicationDate) >= cutoff;
+  }
+
+  private hasRequiredKeyword(text: string): boolean {
+    const lower = text.toLowerCase();
+    return REQUIRED_KEYWORDS.some(kw => lower.includes(kw));
   }
 
   private stripHtml(html: string): string {

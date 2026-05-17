@@ -18,8 +18,8 @@ import { JdAnalysisRequest } from '../../core/models/jd-analysis.model';
       <div class="criteria-info">
         <i class="ti ti-robot" aria-hidden="true"></i>
         <div>
-          <div class="criteria-roles">Frontend Lead · Angular Architect · Engineering Manager Frontend</div>
-          <div class="criteria-sub">Bangalore &nbsp;·&nbsp; Remote / Hybrid &nbsp;·&nbsp; Germany &amp; Europe (sponsored) &nbsp;·&nbsp; Score ≥ 65%</div>
+          <div class="criteria-roles">Angular · UI Architect · JavaScript / TypeScript roles</div>
+          <div class="criteria-sub">Bangalore (Hybrid/Remote) &nbsp;·&nbsp; Germany &amp; Europe (relocation) &nbsp;·&nbsp; Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65%</div>
         </div>
       </div>
       <button class="refresh-btn" (click)="runSearch()" [disabled]="loading">
@@ -280,11 +280,12 @@ export class JobHuntComponent implements OnInit {
   expandedId: string | null = null;
 
   readonly loadingMessages = [
-    'Scanning Remotive for Angular roles…',
-    'Fetching Frontend Lead openings…',
-    'Scoring roles against your resume…',
+    'Scanning for Angular & UI Architect roles…',
+    'Filtering Bangalore, Remote & Europe jobs…',
+    'Checking posts from the last 7 days…',
+    'Scoring each role against your resume…',
     'Filtering matches above 65%…',
-    'Almost there — ranking results…',
+    'Ranking results — almost done…',
   ];
   loadingMsg = this.loadingMessages[0];
   private msgInterval: ReturnType<typeof setInterval> | null = null;
