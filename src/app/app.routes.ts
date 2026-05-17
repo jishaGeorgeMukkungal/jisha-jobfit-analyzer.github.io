@@ -17,6 +17,11 @@ export const routes: Routes = [
       import('./features/jd-match/jd-match.component').then(m => m.JdMatchComponent)
   },
   {
+    path: 'job-hunt',
+    loadComponent: () =>
+      import('./features/job-hunt/job-hunt.component').then(m => m.JobHuntComponent)
+  },
+  {
     path: 'saved-jobs',
     loadComponent: () =>
       import('./features/saved-jobs/saved-jobs.component').then(m => m.SavedJobsComponent)

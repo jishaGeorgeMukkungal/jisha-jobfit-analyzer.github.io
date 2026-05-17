@@ -17,6 +17,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <i class="ti ti-briefcase" aria-hidden="true"></i>
           <span>JD Match</span>
         </a>
+        <a class="nav-tab" routerLink="/job-hunt" routerLinkActive="active">
+          <i class="ti ti-robot" aria-hidden="true"></i>
+          <span>Job Hunt</span>
+        </a>
         <a class="nav-tab" routerLink="/saved-jobs" routerLinkActive="active">
           <i class="ti ti-bookmark" aria-hidden="true"></i>
           <span>Saved Jobs</span>
