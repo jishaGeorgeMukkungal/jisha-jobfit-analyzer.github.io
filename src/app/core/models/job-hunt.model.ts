@@ -28,8 +28,9 @@ export const DEFAULT_CRITERIA: JobSearchCriteria = {
     'angular frontend lead',
     'javascript ui architect',
     'frontend architect angular',
+    'angular', 'javascript', 'ui'
   ],
-  minScore: 65,
+  minScore: 45,
 };
 
 export const LOCATION_INCLUDE = [
@@ -43,11 +44,11 @@ export const LOCATION_INCLUDE = [
 ];
 
 export const LOCATION_EXCLUDE = [
-  'usa only', 'us only', 'united states only',
-  'canada only', 'australia only', 'latin america only',
-  'north america only', 'apac only',
+  // 'usa only', 'us only', 'united states only',
+  // 'canada only', 'australia only', 'latin america only',
+  // 'north america only', 'apac only',
 ];
 
-export const REQUIRED_KEYWORDS = ['angular', 'ui architect', 'ui architecture', 'javascript', 'typescript'];
+export const REQUIRED_KEYWORDS = ['angular', 'ui architect', 'ui architecture', 'ui', 'team lead','javascript', 'typescript'];
 
-export const POSTED_WITHIN_DAYS = 7;
+export const POSTED_WITHIN_DAYS = 30;

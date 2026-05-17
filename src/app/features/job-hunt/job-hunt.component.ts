@@ -47,12 +47,12 @@ import { JdAnalysisRequest } from '../../core/models/jd-analysis.model';
         <div>
           @if (isCustomSearch) {
             <div class="criteria-roles">Custom search: "{{ activeQueryLabel }}"</div>
-            <div class="criteria-sub">Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65% &nbsp;·&nbsp;
+            <div class="criteria-sub">Posted ≤ 30 days &nbsp;·&nbsp; Score ≥ 45% &nbsp;·&nbsp;
               <span class="reset-link" (click)="clearSearch()">← Reset to AI defaults</span>
             </div>
           } @else {
             <div class="criteria-roles">Angular · UI Architect · JavaScript / TypeScript roles</div>
-            <div class="criteria-sub">Bangalore (Hybrid/Remote) &nbsp;·&nbsp; Germany &amp; Europe (relocation) &nbsp;·&nbsp; Posted ≤ 7 days &nbsp;·&nbsp; Score ≥ 65%</div>
+            <div class="criteria-sub">Bangalore (Hybrid/Remote) &nbsp;·&nbsp; Germany &amp; Europe (relocation) &nbsp;·&nbsp; Posted ≤ 30 days &nbsp;·&nbsp; Score ≥ 45%</div>
           }
         </div>
       </div>
@@ -336,9 +336,9 @@ export class JobHuntComponent implements OnInit {
   readonly loadingMessages = [
     'Scanning for Angular & UI Architect roles…',
     'Filtering Bangalore, Remote & Europe jobs…',
-    'Checking posts from the last 7 days…',
+    'Checking posts from the last 30 days…',
     'Scoring each role against your resume…',
-    'Filtering matches above 65%…',
+    'Filtering matches above 45%…',
     'Ranking results — almost done…',
   ];
   loadingMsg = this.loadingMessages[0];
